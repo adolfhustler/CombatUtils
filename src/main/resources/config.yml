@@ -1,0 +1,54 @@
+# ###########################################################################
+#                          Combat Utilities                                 #
+#                                                                           #
+# Made by: Adolf Hustler                                                    #
+# Bug Reports: https://github.com/adolfhustler/CombatUtils/issues           #
+# Source Code: https://github.com/adolfhustler/CombatUtils                  #
+#                                                                           #
+# ###########################################################################
+
+# General Combat Settings
+general:
+  # Default combat timeout in seconds
+  combat-timeout: 15 # Time (in seconds) before players are no longer in combat
+  # Should PvP status changes be logged in the console?
+  log-pvp-changes: true # Set to 'true' to log PvP status changes to the console
+
+# Player Messages
+messages:
+  # Message when the player tries to attack someone with PvP disabled
+  pvp-disabled-victim: '&cYou cannot attack this player because they have PvP disabled.'
+  # Message when the player tries to attack someone when you have PvP disabled
+  pvp-disabled-attacker: '&cYou cannot attack this player because you have PvP disabled.'
+  # Message when PvP is disabled for the player
+  pvp-disabled-self: '&cPvP has been disabled for you!'
+  # Message when PvP is enabled for the player
+  pvp-enabled-self: '&aPvP has been enabled for you!'
+  # Message shown on the action bar during combat
+  combat-timer-message: '&cCombat Timer: {time}s' # Format for action bar message during combat
+  # Message shown after combat timer ends
+  combat-timer-ended: '&aYou are no longer in combat.'
+
+# Permissions
+permissions:
+  # Permission to toggle PvP for a player
+  toggle-pvp: combatutils.toggle # Permission to allow toggling of PvP
+
+# Combat Utilities
+combat-utils:
+  # Should players who disconnect during combat get punished?
+  punish-on-quit: true # If true, players are killed upon quitting during combat
+
+#List of dead players
+dead-players: {}
+
+# Optional Custom Death Messages
+custom-death-messages:
+  # Message shown when a player disconnects during combat
+  disconnect-death-message: '&c{player} was killed for disconnecting during combat!'
+
+
+# Notes:
+# 1. You must reload the plugin or restart the server after making changes to this config for them to take effect.
+# 2. Use the command '/combatutilsreload' to reload the plugin configuration without restarting the server.
+# 3. You can adjust the combat timeout and other settings here to fit your server's needs.

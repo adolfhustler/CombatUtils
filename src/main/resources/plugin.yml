@@ -1,0 +1,17 @@
+name: CombatUtils
+version: '1.0.0'
+main: me.adolfhustler.combatutils.CombatUtils
+api-version: '1.21'
+commands:
+  pvp:
+    description: Toggle PvP status for the player
+    usage: /pvp
+  pvpstatus:
+    description: Check PvP status of a player
+    usage: /pvpstatus (player)
+  combatutilsreload:
+    description: Reload the CombatUtils config
+    usage: /combatutilsreload
+
+
+
