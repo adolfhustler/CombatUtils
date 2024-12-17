@@ -17,24 +17,28 @@ public class PvPCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            boolean currentStatus = plugin.getPvPStatus(player);
-            boolean newStatus = !currentStatus;
-
-            plugin.setPvPStatus(player, newStatus);
-
-            String message;
-            if (newStatus) {
-                message = plugin.getConfig().getString("messages.pvp-enabled-self", "&aPvP has been enabled for you!");
-            } else {
-                message = plugin.getConfig().getString("messages.pvp-disabled-self", "&cPvP has been disabled for you!");
-            }
-
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return true;
+        if (!(sender instanceof Player)) {
+            String consoleMessage = "&cOnly players can use this command.";
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', consoleMessage));
+            return false;
         }
-        sender.sendMessage(ChatColor.RED + "Only players can use this command.");
-        return false;
+
+        Player player = (Player) sender;
+
+        if (plugin.isInCombat(player)) {
+            String combatMessage = "&cYou cannot toggle PvP while in combat!";
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', combatMessage));
+            return false;
+        }
+
+        boolean currentStatus = plugin.getPvPStatus(player);
+        boolean newStatus = !currentStatus;
+        plugin.setPvPStatus(player, newStatus);
+
+        String messageKey = newStatus ? "messages.pvp-enabled-self" : "messages.pvp-disabled-self";
+        String message = plugin.getConfig().getString(messageKey, "&aPvP status has been updated.");
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+
+        return true;
     }
 }
