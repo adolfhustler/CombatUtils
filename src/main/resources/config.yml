@@ -14,6 +14,12 @@ general:
   # Should PvP status changes be logged in the console?
   log-pvp-changes: true # Set to 'true' to log PvP status changes to the console
 
+# Grace period a player has after joining the server/teleporting where they are immune to PvP
+grace-period:
+  enabled: true
+  # How long the grace period should last
+  seconds: 10
+
 # Player Messages
 messages:
   # Message when the player tries to attack someone with PvP disabled
@@ -28,6 +34,16 @@ messages:
   combat-timer-message: '&cCombat Timer: {time}s' # Format for action bar message during combat
   # Message shown after combat timer ends
   combat-timer-ended: '&aYou are no longer in combat.'
+  # Message shown when grace period starts
+  grace-period-start: "&aYou have a short grace period of PvP immunity!"
+  # Message shown when grace period ends
+  grace-period-end: "&cYour PvP grace period has ended!"
+  # Message shown when trying to attack a player during their grace period
+  grace-period-attack: "&cYou cannot attack players during their grace period!"
+  # Message shown when trying to attack a player when you are in a grace period
+  grace-period-attack-self: "&cYou cannot attack players when you are in a grace period!"
+  # Message shown on the action bar during grace period
+  grace-timer-message: "&aGrace Timer: {time}s"
 
 # Permissions
 permissions:
