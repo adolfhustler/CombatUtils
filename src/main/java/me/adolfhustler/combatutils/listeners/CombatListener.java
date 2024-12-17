@@ -12,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -20,7 +21,7 @@ import java.util.UUID;
 public class CombatListener implements Listener {
 
     private final CombatUtils plugin;
-    private final HashMap<UUID, BukkitRunnable> combatTasks;
+    public final HashMap<UUID, BukkitRunnable> combatTasks;
 
     public CombatListener(CombatUtils plugin) {
         this.plugin = plugin;
@@ -32,6 +33,19 @@ public class CombatListener implements Listener {
         if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
             Player attacker = (Player) event.getDamager();
             Player victim = (Player) event.getEntity();
+
+            if(plugin.isInGracePeriod(victim)){
+                event.setCancelled(true);
+                String graceAttackMessage = plugin.getConfig().getString("messages.grace-period-attack", "&cThat player is in a grace period and cannot be attacked!");
+                attacker.sendMessage(ChatColor.translateAlternateColorCodes('&', graceAttackMessage));
+                return;
+            }
+            if(plugin.isInGracePeriod(attacker)){
+                event.setCancelled(true);
+                String graceAttackMessageSelf = plugin.getConfig().getString("messages.grace-period-attack-self", "&cYou cannot attack players when you are in a grace period!");
+                attacker.sendMessage(ChatColor.translateAlternateColorCodes('&', graceAttackMessageSelf));
+                return;
+            }
 
             if (!plugin.getPvPStatus(attacker)) {
                 event.setCancelled(true);
@@ -70,10 +84,13 @@ public class CombatListener implements Listener {
                 plugin.endCombat(opponent);
             }
 
-            plugin.markPlayerDeadOnDisconnect(disconnectedPlayer);
+            plugin.getConfig().set("dead-players." + disconnectedPlayer.getUniqueId(), true);
+            plugin.saveConfig();
 
+            disconnectedPlayer.setHealth(0);
         }
     }
+
 
 
 
@@ -83,9 +100,21 @@ public class CombatListener implements Listener {
         Player player = event.getPlayer();
 
         if (plugin.getConfig().getBoolean("dead-players." + player.getUniqueId(), false)) {
-            player.setHealth(0);
             plugin.getConfig().set("dead-players." + player.getUniqueId(), null);
             plugin.saveConfig();
+        }
+        plugin.startGracePeriod(player);
+        //startGracePeriod(player)
+
+
+    }
+
+    @EventHandler
+    public void onTeleport(PlayerTeleportEvent event){
+        Player player = event.getPlayer();
+        if(!plugin.isInCombat(player)){
+            plugin.startGracePeriod(player);
+            //startGraceTimer(player);
         }
     }
 
@@ -110,8 +139,43 @@ public class CombatListener implements Listener {
         }
     }
 
+   /* private void startGraceTimer(Player player) {
+        BukkitRunnable existingTask = combatTasks.get(player.getUniqueId());
+        if (existingTask != null) {
+            existingTask.cancel();
+        }
+
+        int graceSeconds = plugin.getConfig().getInt("grace-period.seconds", 10);
+        long graceEnd = System.currentTimeMillis() + (graceSeconds * 1000L);
+
+        BukkitRunnable task = new BukkitRunnable() {
+            @Override
+            public void run() {
+                long remaining = graceEnd - System.currentTimeMillis();
+                if(plugin.isInCombat(player)){
+                    cancel();
+                    return;
+                }
+                if (remaining <= 0) {
+                    cancel();
+                    return;
+                }
+
+                long roundedRemaining = (long) Math.ceil(remaining / 1000.0);
+                String actionBarMessage = plugin.getConfig().getString("messages.grace-timer-message", "&aGrace Timer: {time}s");
+                actionBarMessage = actionBarMessage.replace("{time}", String.valueOf(roundedRemaining));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&', actionBarMessage)));
+            }
+        };
+
+        task.runTaskTimer(plugin, 0L, 20L);
+        combatTasks.put(player.getUniqueId(), task);
+    }
+
+     */
+
+
     private void startCombatTimer(Player player) {
-        // Cancel existing timer if it exists
         BukkitRunnable existingTask = combatTasks.get(player.getUniqueId());
         if (existingTask != null) {
             existingTask.cancel();
